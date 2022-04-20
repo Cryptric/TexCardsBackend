@@ -1,4 +1,4 @@
-package ch.cryptric.tex.cards.texcardsrestservice;
+package ch.cryptric.tex.cards.texcardsrestservice.model;
 
 import javax.persistence.*;
 

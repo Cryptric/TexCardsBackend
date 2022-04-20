@@ -1,5 +1,9 @@
 package ch.cryptric.tex.cards.texcardsrestservice;
 
+import ch.cryptric.tex.cards.texcardsrestservice.model.Flashcard;
+import ch.cryptric.tex.cards.texcardsrestservice.model.FlashcardSet;
+import ch.cryptric.tex.cards.texcardsrestservice.service.FlashcardService;
+import ch.cryptric.tex.cards.texcardsrestservice.service.FlashcardSetService;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

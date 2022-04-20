@@ -1,4 +1,4 @@
-package ch.cryptric.tex.cards.texcardsrestservice;
+package ch.cryptric.tex.cards.texcardsrestservice.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

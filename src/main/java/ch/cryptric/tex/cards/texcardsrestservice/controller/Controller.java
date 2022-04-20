@@ -1,9 +1,14 @@
-package ch.cryptric.tex.cards.texcardsrestservice;
+package ch.cryptric.tex.cards.texcardsrestservice.controller;
 
+import ch.cryptric.tex.cards.texcardsrestservice.model.Flashcard;
+import ch.cryptric.tex.cards.texcardsrestservice.api.response.APIFlashcardSet;
+import ch.cryptric.tex.cards.texcardsrestservice.api.response.APIFlashcardsSets;
+import ch.cryptric.tex.cards.texcardsrestservice.model.FlashcardSet;
+import ch.cryptric.tex.cards.texcardsrestservice.service.FlashcardService;
+import ch.cryptric.tex.cards.texcardsrestservice.service.FlashcardSetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 

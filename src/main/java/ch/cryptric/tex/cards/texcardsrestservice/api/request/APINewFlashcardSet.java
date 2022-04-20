@@ -1,4 +1,4 @@
-package ch.cryptric.tex.cards.texcardsrestservice;
+package ch.cryptric.tex.cards.texcardsrestservice.api.request;
 
 public class APINewFlashcardSet {
 

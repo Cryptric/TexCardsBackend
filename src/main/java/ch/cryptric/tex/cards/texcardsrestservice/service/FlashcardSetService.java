@@ -1,5 +1,7 @@
-package ch.cryptric.tex.cards.texcardsrestservice;
+package ch.cryptric.tex.cards.texcardsrestservice.service;
 
+import ch.cryptric.tex.cards.texcardsrestservice.model.FlashcardSet;
+import ch.cryptric.tex.cards.texcardsrestservice.repository.FlashcardSetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
