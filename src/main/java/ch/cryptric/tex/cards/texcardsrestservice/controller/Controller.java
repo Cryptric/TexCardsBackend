@@ -75,9 +75,5 @@ public class Controller {
         return flashcardSet.getID();
     }
 
-    @GetMapping(value = "/add-card")
-    public String[] addCard() {
-        return new String[] {"a", "b", "c"};
-    }
 
 }
