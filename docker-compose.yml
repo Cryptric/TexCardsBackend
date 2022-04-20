@@ -2,11 +2,22 @@ version: '3.1'
 services:
   db:
     image: mysql
-    restart: always
+    restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: test_db
-    ports:
-      - "3307:3306"
+      MYSQL_DATABASE: tex_cards
+#    ports:
+#      - "3307:3306"
     volumes:
-      - /home/gawain/mysql_data:/var/lib/mysql
+      - /home/gawain/tex-cards/mysql-data:/var/lib/mysql
+  java:
+    image: openjdk:17.0.2
+    restart: unless-stopped
+    depends_on:
+      - db
+    ports:
+      - "8081:8080"
+    volumes:
+      - /home/gawain/tex-cards/java-data:/usr/jar
+    working_dir: /usr/jar
+    command: java -jar tex-cards-rest-service-0.0.1-SNAPSHOT.jar
