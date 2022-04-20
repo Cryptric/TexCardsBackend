@@ -3,6 +3,7 @@ package ch.cryptric.tex.cards.texcardsrestservice.controller;
 import ch.cryptric.tex.cards.texcardsrestservice.model.TexCardsUser;
 import ch.cryptric.tex.cards.texcardsrestservice.repository.TexCardsUserRepository;
 import ch.cryptric.tex.cards.texcardsrestservice.service.JwtUserDetailsService;
+import ch.cryptric.tex.cards.texcardsrestservice.util.JwtRequest;
 import ch.cryptric.tex.cards.texcardsrestservice.util.JwtTokenUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -14,15 +15,13 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @RestController
+@CrossOrigin
 @RequestMapping("/auth")
 public class AuthenticationController {
 
@@ -41,13 +40,14 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestParam("user_name") String username, @RequestParam("password") String password) {
+    public ResponseEntity<?> loginUser(@RequestBody JwtRequest request) {
+        System.out.println(request);
         Map<String, Object> responseMap = new HashMap<>();
         try {
-            Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+            Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
             if (auth.isAuthenticated()) {
                 logger.info("Logged In");
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUsername());
                 String token = jwtTokenUtil.generateToken(userDetails);
                 responseMap.put("error", false);
                 responseMap.put("message", "Logged In");

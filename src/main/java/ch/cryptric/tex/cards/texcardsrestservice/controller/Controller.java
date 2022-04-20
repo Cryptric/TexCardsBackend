@@ -13,6 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 @RestController
+@CrossOrigin
 public class Controller {
 
     @Autowired
@@ -47,7 +48,6 @@ public class Controller {
 
     @PutMapping(value = "/flashcard-set-edit")
     public boolean editFlashcardSet(@RequestBody APIFlashcardSet apiFlashcardSet) {
-        System.out.println("put request " + apiFlashcardSet.toString());
 
         flashcardService.deleteBySetID(apiFlashcardSet.getId());
         FlashcardSet flashcardSet = flashcardSetService.getByID(apiFlashcardSet.getId());
