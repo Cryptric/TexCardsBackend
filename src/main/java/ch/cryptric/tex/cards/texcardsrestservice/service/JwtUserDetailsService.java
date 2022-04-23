@@ -24,7 +24,7 @@ public class JwtUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        TexCardsUser user = texCardsUserRepository.findTexCardsUserByuserName(username);
+        TexCardsUser user = texCardsUserRepository.findTexCardsUserByUserName(username);
         List<GrantedAuthority> authorityList = new ArrayList<>();
         authorityList.add(new SimpleGrantedAuthority("USER_ROLE")); // TODO remove?
         return new User(user.getUserName(), user.getPassword(), authorityList);

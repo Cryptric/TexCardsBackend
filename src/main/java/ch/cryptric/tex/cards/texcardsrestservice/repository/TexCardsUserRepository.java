@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TexCardsUserRepository extends JpaRepository<TexCardsUser, Long> {
 
-    TexCardsUser findTexCardsUserByuserName(String username);
+    TexCardsUser findTexCardsUserByUserName(String username);
 
 }

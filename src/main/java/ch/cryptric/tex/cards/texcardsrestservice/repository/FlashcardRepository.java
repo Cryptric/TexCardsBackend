@@ -12,7 +12,11 @@ public interface FlashcardRepository extends JpaRepository<Flashcard, Long> {
 
     List<Flashcard> findBysetID(long setID);
 
+    Flashcard findBySetIDAndTermAndDefinition(long setID, String term, String definition);
+
+
+
     @Transactional
-    void deleteBysetID(long setID);
+    long deleteBySetID(long setID);
 
 }

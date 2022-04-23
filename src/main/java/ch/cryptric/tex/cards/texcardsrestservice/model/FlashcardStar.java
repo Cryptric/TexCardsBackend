@@ -1,5 +1,6 @@
 package ch.cryptric.tex.cards.texcardsrestservice.model;
 
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,19 +12,21 @@ import javax.persistence.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "flashcard_sets")
+@Table(name = "flashcard_stars")
 @Entity
-public class FlashcardSet {
+public class FlashcardStar {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long ID;
-    private String name;
-    private long creatorID;
+    private long flashcardID;
+    private long flashcardSetID;
+    private long userID;
 
-    public FlashcardSet(String name, long creatorID) {
-        this.name = name;
-        this.creatorID = creatorID;
+    public FlashcardStar(long userID, long flashcardSetID, long flashcardID) {
+        this.flashcardID = flashcardID;
+        this.flashcardSetID = flashcardSetID;
+        this.userID = userID;
     }
 
 }

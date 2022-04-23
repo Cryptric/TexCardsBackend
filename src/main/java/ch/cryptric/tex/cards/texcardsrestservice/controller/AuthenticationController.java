@@ -1,5 +1,6 @@
 package ch.cryptric.tex.cards.texcardsrestservice.controller;
 
+import ch.cryptric.tex.cards.texcardsrestservice.api.request.APIRegister;
 import ch.cryptric.tex.cards.texcardsrestservice.model.TexCardsUser;
 import ch.cryptric.tex.cards.texcardsrestservice.repository.TexCardsUserRepository;
 import ch.cryptric.tex.cards.texcardsrestservice.service.JwtUserDetailsService;
@@ -41,7 +42,6 @@ public class AuthenticationController {
 
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody JwtRequest request) {
-        System.out.println(request);
         Map<String, Object> responseMap = new HashMap<>();
         try {
             Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
@@ -76,17 +76,17 @@ public class AuthenticationController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> saveUser(@RequestParam("user_name") String userName, @RequestParam("email") String email, @RequestParam("password") String password) {
+    public ResponseEntity<?> saveUser(@RequestBody APIRegister apiRegister) {
         Map<String, Object> responseMap = new HashMap<>();
         TexCardsUser user = new TexCardsUser();
-        user.setEmail(email);
-        user.setPassword(new BCryptPasswordEncoder().encode(password));
-        user.setUserName(userName);
-        UserDetails userDetails = userDetailsService.createUserDetails(userName, user.getPassword());
+        user.setEmail(apiRegister.getEmail());
+        user.setPassword(new BCryptPasswordEncoder().encode(apiRegister.getPassword()));
+        user.setUserName(apiRegister.getUsername());
+        UserDetails userDetails = userDetailsService.createUserDetails(apiRegister.getUsername(), user.getPassword());
         String token = jwtTokenUtil.generateToken(userDetails);
         texCardsUserRepository.save(user);
         responseMap.put("error", false);
-        responseMap.put("username", userName);
+        responseMap.put("username", apiRegister.getUsername());
         responseMap.put("message", "Account created successfully");
         responseMap.put("token", token);
         return ResponseEntity.ok(responseMap);

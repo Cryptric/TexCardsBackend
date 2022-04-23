@@ -23,8 +23,20 @@ public class FlashcardSetService {
         return set.orElse(null);
     }
 
+    public List<FlashcardSet> findByIDs(Iterable<Long> ids) {
+        return flashcardSetRepository.findAllById(ids);
+    }
+
     public void save(FlashcardSet flashcardSet) {
         flashcardSetRepository.saveAndFlush(flashcardSet);
+    }
+
+    public boolean isCreator(long flashcardSetID, long userID) {
+        return flashcardSetRepository.existsByIDAndCreatorID(flashcardSetID, userID);
+    }
+
+    public void deleteByID(long id) {
+        flashcardSetRepository.deleteByID(id);
     }
 
 }

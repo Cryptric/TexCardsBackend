@@ -22,4 +22,9 @@ public class TexCardsUser {
     private String email;
     private String password;
 
+    public TexCardsUser(String userName, String email, String password) {
+        this.userName = userName;
+        this.email = email;
+        this.password = password;
+    }
 }
