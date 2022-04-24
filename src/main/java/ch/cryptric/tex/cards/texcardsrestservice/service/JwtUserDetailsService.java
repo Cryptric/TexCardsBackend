@@ -2,6 +2,7 @@ package ch.cryptric.tex.cards.texcardsrestservice.service;
 
 import ch.cryptric.tex.cards.texcardsrestservice.model.TexCardsUser;
 import ch.cryptric.tex.cards.texcardsrestservice.repository.TexCardsUserRepository;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -25,6 +26,9 @@ public class JwtUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         TexCardsUser user = texCardsUserRepository.findTexCardsUserByUserName(username);
+        if (user == null) {
+            throw new BadCredentialsException("no such user");
+        }
         List<GrantedAuthority> authorityList = new ArrayList<>();
         authorityList.add(new SimpleGrantedAuthority("USER_ROLE")); // TODO remove?
         return new User(user.getUserName(), user.getPassword(), authorityList);

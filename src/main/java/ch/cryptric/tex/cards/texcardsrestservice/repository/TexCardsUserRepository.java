@@ -9,4 +9,6 @@ public interface TexCardsUserRepository extends JpaRepository<TexCardsUser, Long
 
     TexCardsUser findTexCardsUserByUserName(String username);
 
+    boolean existsByUserName(String userName);
+
 }
