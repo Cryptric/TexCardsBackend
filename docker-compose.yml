@@ -29,5 +29,6 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - /home/gawain/tex-cards/html:/usr/share/nginx/html
+      - /home/gawain/tex-cards/nginx/html:/var/www/trade.cryptric.ch/
+      - /home/gawain/tex-cards/nginx/conf/:/etc/nginx/conf.d/
     restart: unless-stopped
