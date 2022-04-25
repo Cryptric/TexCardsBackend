@@ -10,14 +10,24 @@ services:
 #      - "3307:3306"
     volumes:
       - /home/gawain/tex-cards/mysql-data:/var/lib/mysql
+
   java:
     image: openjdk:17.0.2
     restart: unless-stopped
     depends_on:
       - db
     ports:
-      - "8081:8080"
+      - "8080:8080"
     volumes:
       - /home/gawain/tex-cards/java-data:/usr/jar
     working_dir: /usr/jar
     command: java -jar tex-cards-rest-service-0.0.1-SNAPSHOT.jar
+
+  web:
+    image: nginx:latest
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /home/gawain/tex-cards/html:/usr/share/nginx/html
+    restart: unless-stopped

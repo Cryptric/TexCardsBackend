@@ -33,4 +33,8 @@ public class FlashcardService {
         return flashcardRepository.findBySetIDAndTermAndDefinition(setID, term, definition);
     }
 
+    public void remove(List<Flashcard> flashcards) {
+        flashcardRepository.deleteAll(flashcards);
+    }
+
 }

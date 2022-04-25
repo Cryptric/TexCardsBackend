@@ -138,7 +138,7 @@ public class Controller {
                 responseMap.put("message", "You do not have permission to edit this flashcard set");
                 return ResponseEntity.status(403).body(responseMap);
             }
-            flashcardService.deleteAllByFlashcardSetID(apiFlashcardSet.getId());
+            //flashcardService.deleteAllByFlashcardSetID(apiFlashcardSet.getId());
             FlashcardSet flashcardSet = flashcardSetService.getByID(apiFlashcardSet.getId());
             if (flashcardSet == null) {
                 responseMap.put("error", true);
@@ -148,11 +148,29 @@ public class Controller {
             flashcardSet.setName(apiFlashcardSet.getFlashcardSetName());
             flashcardSetService.save(flashcardSet);
 
-            List<Flashcard> flashcards = new LinkedList<>();
+            List<Flashcard> flashcardsDB = flashcardService.listWhereSetID(apiFlashcardSet.getId());
+
+            List<Flashcard> toSave = new LinkedList<>(); // all in apiFlashcards similar to one in flashcardsDB
+            List<Flashcard> toDelete; // all in flashcardDB but not in toSave
             for (int i = 0; i < apiFlashcardSet.getDefinitions().length; i++) {
-                flashcards.add(new Flashcard(apiFlashcardSet.getId(), apiFlashcardSet.getTerms()[i], apiFlashcardSet.getDefinitions()[i]));
+                int sim = Flashcard.similarToOne(flashcardsDB, apiFlashcardSet.getDefinitions()[i], apiFlashcardSet.getTerms()[i]);
+                if (sim >= 0) {
+                    // save
+                    Flashcard card = flashcardsDB.remove(sim);
+                    card.setDefinition(apiFlashcardSet.getDefinitions()[i]);
+                    card.setTerm(apiFlashcardSet.getTerms()[i]);
+                    toSave.add(card);
+                } else {
+                    // add
+                    Flashcard card = new Flashcard(apiFlashcardSet.getId(), apiFlashcardSet.getDefinitions()[i], apiFlashcardSet.getTerms()[i]);
+                    toSave.add(card);
+                }
             }
-            flashcardService.save(flashcards);
+            toDelete = new LinkedList<>(flashcardsDB);
+
+            flashcardService.save(toSave);
+            flashcardService.remove(toDelete);
+
             responseMap.put("error", false);
             responseMap.put("data", true);
             return ResponseEntity.ok(responseMap);
