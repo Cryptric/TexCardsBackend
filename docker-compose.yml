@@ -7,10 +7,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: tex_cards
-#    ports:
-#      - "3307:3306"
     volumes:
-      - /home/gawain/tex-cards/mysql-data:/var/lib/mysql
+      - /opt/tex-cards/mysql-data:/var/lib/mysql
     labels:
       - "traefik.enable=false"
 
@@ -19,21 +17,19 @@ services:
     image: traefik:2.6.0
     restart: unless-stopped
     ports:
-      - 80:80
       - 443:443
       - 8080:8080
     command:
-      - --log.level=DEBUG
-#      - --entrypoints.web.address=:80
-      - --entrypoints.web-secure.address=:443 # Declares the web-secure entrypoint in Traefik
+#     - --log.level=DEBUG
+      - --entrypoints.web-secure.address=:443
       - --entrypoints.webalt.address=:8080
-      - --certificatesresolvers.le.acme.email=gawain.marti@gmail.com
+      - --certificatesresolvers.le.acme.email=[EMAIL]
       - --certificatesresolvers.le.acme.storage=/acme.json
       - --certificatesresolvers.le.acme.tlschallenge=true
       - --providers.docker=true
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /home/gawain/tex-cards/traefik/acme.json:/acme.json
+      - /opt/tex-cards/traefik/acme.json:/acme.json
     labels:
       - "traefik.enable=false"
 
@@ -43,15 +39,13 @@ services:
     restart: unless-stopped
     depends_on:
       - db
-#    ports:
-#      - "8080:8080"
     volumes:
-      - /home/gawain/tex-cards/java-data:/usr/jar
+      - /opt/tex-cards/java-data:/usr/jar
     working_dir: /usr/jar
     command: java -jar tex-cards-rest-service-0.0.1-SNAPSHOT.jar
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.java.rule=Host(`trade.cryptric.ch`)"
+      - "traefik.http.routers.java.rule=Host(`tex-cards.cryptric.ch`)"
       - "traefik.http.routers.java.tls.certresolver=le"
       - "traefik.http.services.java.loadbalancer.server.port=8080"
       - "traefik.http.routers.java.entrypoints=webalt"
@@ -59,16 +53,13 @@ services:
   web:
     container_name: web
     image: nginx:latest
-#    ports:
-#      - "80:80"
-#      - "443:443"
     volumes:
-      - /home/gawain/tex-cards/nginx/html:/var/www/trade.cryptric.ch/
-      - /home/gawain/tex-cards/nginx/conf/:/etc/nginx/conf.d/
+      - /opt/tex-cards/nginx/html:/var/www/tex-cards.cryptric.ch/
+      - /opt/tex-cards/nginx/conf/:/etc/nginx/conf.d/
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.web.rule=Host(`trade.cryptric.ch`)"
+      - "traefik.http.routers.web.rule=Host(`tex-cards.cryptric.ch`)"
       - "traefik.http.routers.web.tls.certresolver=le"
       - "traefik.http.services.web.loadbalancer.server.port=80"
       - "traefik.http.routers.web.entrypoints=web-secure"
