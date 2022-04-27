@@ -27,7 +27,7 @@ services:
 #      - --entrypoints.web.address=:80
       - --entrypoints.web-secure.address=:443 # Declares the web-secure entrypoint in Traefik
       - --entrypoints.webalt.address=:8080
-      - --certificatesresolvers.le.acme.email=gawain.marti@gmail.com
+      - --certificatesresolvers.le.acme.email=[EMAIL]
       - --certificatesresolvers.le.acme.storage=/acme.json
       - --certificatesresolvers.le.acme.tlschallenge=true
       - --providers.docker=true
