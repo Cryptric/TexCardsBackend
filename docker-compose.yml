@@ -5,10 +5,15 @@ services:
     image: mysql
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_RANDOM_ROOT_PASSWORD: root
       MYSQL_DATABASE: tex_cards
+      MYSQL_USER: backend
+      MYSQL_PASSWORD: password
+    ports:
+      - 3306:3306
     volumes:
       - /opt/tex-cards/mysql-data:/var/lib/mysql
+      - /opt/tex-cards/backup:/opt/backup
     labels:
       - "traefik.enable=false"
 
@@ -17,10 +22,14 @@ services:
     image: traefik:2.6.0
     restart: unless-stopped
     ports:
+      - 80:80
       - 443:443
       - 8080:8080
     command:
 #     - --log.level=DEBUG
+      - --entrypoints.web.address=:80
+      - --entrypoints.web.http.redirections.entrypoint.to=web-secure
+      - --entrypoints.web.http.redirections.entrypoint.scheme=https
       - --entrypoints.web-secure.address=:443
       - --entrypoints.webalt.address=:8080
       - --certificatesresolvers.le.acme.email=[EMAIL]

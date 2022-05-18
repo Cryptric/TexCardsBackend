@@ -1,33 +1,19 @@
 package ch.cryptric.tex.cards.texcardsrestservice.api.response;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 public class APIFlashcardsSets {
 
     private long[] ids;
     private String[] names;
-
-    public APIFlashcardsSets() {
-
-    }
-
-    public APIFlashcardsSets(long[] ids, String[] names) {
-        this.ids = ids;
-        this.names = names;
-    }
-
-    public long[] getIds() {
-        return ids;
-    }
-
-    public void setIds(long[] ids) {
-        this.ids = ids;
-    }
-
-    public String[] getNames() {
-        return names;
-    }
-
-    public void setNames(String[] names) {
-        this.names = names;
-    }
+    private boolean[] writePermission;
+    private boolean[] owner;
 
 }

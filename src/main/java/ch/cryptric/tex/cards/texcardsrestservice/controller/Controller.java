@@ -46,7 +46,13 @@ public class Controller {
             List<FlashcardSet> allowedSets = flashcardSetService.findByIDs(setWithReadPermissions.stream().mapToLong(FlashcardSetUserRight::getFlashcardSetID).boxed().toList());
             long[] ids = allowedSets.stream().mapToLong(FlashcardSet::getID).toArray();
             String[] names = allowedSets.stream().map(FlashcardSet::getName).toArray(String[]::new);
-            responseMap.put("data", new APIFlashcardsSets(ids, names));
+            boolean[] writePermissions = new boolean[ids.length];
+            boolean[] owner = new boolean[ids.length];
+            for (int i = 0; i < writePermissions.length; i++) {
+                owner[i] = flashcardSetService.isCreator(ids[i], userID);
+                writePermissions[i] = owner[i] || flashcardSetUserRightService.hasUserWritePermission(userID, ids[i]);
+            }
+            responseMap.put("data", new APIFlashcardsSets(ids, names, writePermissions, owner));
             responseMap.put("error", false);
             return ResponseEntity.ok(responseMap);
         } catch (Error | Exception e) {

@@ -20,11 +20,12 @@ public class Flashcard {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long ID;
     private long setID;
+    @Column(length = 1000)
     private String definition;
+    @Column(length = 1000)
     private String term;
 
     public Flashcard(long SetID, String Definition, String Term) {
-        this.ID = ID;
         this.setID = SetID;
         this.definition = Definition;
         this.term = Term;
