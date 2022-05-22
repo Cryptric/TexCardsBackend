@@ -86,6 +86,7 @@ public class Controller {
 
             String[] terms = cards.stream().map(Flashcard::getTerm).toArray(String[]::new);
             String[] definitions = cards.stream().map(Flashcard::getDefinition).toArray(String[]::new);
+            int[] alignments = cards.stream().map(Flashcard::getAlignment).mapToInt(x -> x).toArray();
 
             Set<Long> starIDs = flashcardStarService.findByUserIDAndFlashcardSetID(userID, id).stream().mapToLong(FlashcardStar::getFlashcardID).boxed().collect(Collectors.toSet());
             Set<Integer> starIndices = new HashSet<>();
@@ -99,7 +100,7 @@ public class Controller {
             if (!isOwner) {
                 editPermission = flashcardSetUserRightService.hasUserWritePermission(userID, id);
             }
-            APIFlashcardSet cardSet = new APIFlashcardSet(id, setName, terms, definitions, starIndices, isOwner, editPermission);
+            APIFlashcardSet cardSet = new APIFlashcardSet(id, setName, terms, definitions, alignments, starIndices, isOwner, editPermission);
             responseMap.put("error", false);
             responseMap.put("data", cardSet);
             return ResponseEntity.ok(responseMap);
@@ -165,10 +166,11 @@ public class Controller {
                     Flashcard card = flashcardsDB.remove(sim);
                     card.setDefinition(apiFlashcardSet.getDefinitions()[i]);
                     card.setTerm(apiFlashcardSet.getTerms()[i]);
+                    card.setAlignment(apiFlashcardSet.getAlignment()[i]);
                     toSave.add(card);
                 } else {
                     // add
-                    Flashcard card = new Flashcard(apiFlashcardSet.getId(), apiFlashcardSet.getDefinitions()[i], apiFlashcardSet.getTerms()[i]);
+                    Flashcard card = new Flashcard(apiFlashcardSet.getId(), apiFlashcardSet.getDefinitions()[i], apiFlashcardSet.getTerms()[i], apiFlashcardSet.getAlignment()[i]);
                     toSave.add(card);
                 }
             }

@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Arrays;
 import java.util.Set;
 
 @Getter
@@ -19,6 +18,7 @@ public class APIFlashcardSet {
 
     private String[] terms;
     private String[] definitions;
+    private int[] alignment;
     private Set<Integer> stars;
     private boolean owner;
     private boolean editPermission;
