@@ -1,5 +1,6 @@
 package ch.cryptric.tex.cards.texcardsrestservice.model;
 
+import ch.cryptric.tex.cards.texcardsrestservice.api.request.Card;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,29 +34,16 @@ public class Flashcard {
         this.alignment = alignment;
     }
 
-    /**
-     * compare two flashcards
-     * @param card the flashcard to compare against
-     * @return true if either the definition or the term is equals or both
-     */
-    public boolean similar(Flashcard card) {
-        return setID == card.getSetID() && (definition.equals(card.getDefinition()) || term.equals(card.getTerm()));
-    }
-
-    public boolean similar(String definition, String term) {
-        return this.definition.equals(definition) || this.term.equals(term);
-    }
-
     public boolean equals(Flashcard card) {
-        return definition.equals(card.getDefinition()) && term.equals(card.getTerm()) && setID == card.getSetID();
+        return definition.equals(card.getDefinition()) && term.equals(card.getTerm()) && setID == card.getSetID() && alignment == card.getAlignment();
     }
 
-    public static int similarToOne(List<Flashcard> cards, String definition, String term) {
-        for (int i = 0; i < cards.size(); i++) {
-            if (cards.get(i).similar(definition, term)) {
-                return i;
-            }
-        }
-        return -1;
+    public boolean equals(Card card) {
+        return definition.equals(card.getDefinition()) && term.equals(card.getTerm()) && alignment == card.getAlignment();
     }
+
+    public static Flashcard findFirstEquals(List<Flashcard> flashcards, Card card) {
+        return flashcards.stream().filter(x -> x.equals(card)).findFirst().orElseThrow();
+    }
+
 }

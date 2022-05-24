@@ -1,6 +1,8 @@
 package ch.cryptric.tex.cards.texcardsrestservice.controller;
 
+import ch.cryptric.tex.cards.texcardsrestservice.api.request.APIFlashcardSetEdit;
 import ch.cryptric.tex.cards.texcardsrestservice.api.request.APIFlashcardStar;
+import ch.cryptric.tex.cards.texcardsrestservice.api.request.Card;
 import ch.cryptric.tex.cards.texcardsrestservice.api.response.APIFlashcardSetName;
 import ch.cryptric.tex.cards.texcardsrestservice.api.response.APIUserPermission;
 import ch.cryptric.tex.cards.texcardsrestservice.model.*;
@@ -136,45 +138,67 @@ public class Controller {
     }
 
     @PutMapping(value = "/flashcard-set-edit")
-    public ResponseEntity<?> editFlashcardSet(@RequestBody APIFlashcardSet apiFlashcardSet) {
+    public ResponseEntity<?> editFlashcardSet(@RequestBody APIFlashcardSetEdit apiFlashcardSetEdit) {
         Map<String, Object> responseMap = new HashMap<>();
         try {
             long userID = requestUtil.getUserID();
-            if (!flashcardSetUserRightService.hasUserWritePermission(userID, apiFlashcardSet.getId())) {
+            if (!flashcardSetUserRightService.hasUserWritePermission(userID, apiFlashcardSetEdit.getId())) {
                 responseMap.put("error", true);
                 responseMap.put("message", "You do not have permission to edit this flashcard set");
                 return ResponseEntity.status(403).body(responseMap);
             }
             //flashcardService.deleteAllByFlashcardSetID(apiFlashcardSet.getId());
-            FlashcardSet flashcardSet = flashcardSetService.getByID(apiFlashcardSet.getId());
+            FlashcardSet flashcardSet = flashcardSetService.getByID(apiFlashcardSetEdit.getId());
             if (flashcardSet == null) {
                 responseMap.put("error", true);
                 responseMap.put("message", "Flashcard set not found");
                 return ResponseEntity.status(404).body(responseMap);
             }
-            flashcardSet.setName(apiFlashcardSet.getFlashcardSetName());
-            flashcardSetService.save(flashcardSet);
+            if (!flashcardSet.getName().equals(apiFlashcardSetEdit.getFlashcardSetName())) {
+                flashcardSet.setName(apiFlashcardSetEdit.getFlashcardSetName());
+                flashcardSetService.save(flashcardSet);
+            }
 
-            List<Flashcard> flashcardsDB = flashcardService.listWhereSetID(apiFlashcardSet.getId());
+            long setID = apiFlashcardSetEdit.getId();
+
+            List<Flashcard> flashcardsDB = flashcardService.listWhereSetID(setID);
 
             List<Flashcard> toSave = new LinkedList<>(); // all in apiFlashcards similar to one in flashcardsDB
-            List<Flashcard> toDelete; // all in flashcardDB but not in toSave
-            for (int i = 0; i < apiFlashcardSet.getDefinitions().length; i++) {
-                int sim = Flashcard.similarToOne(flashcardsDB, apiFlashcardSet.getDefinitions()[i], apiFlashcardSet.getTerms()[i]);
-                if (sim >= 0) {
-                    // save
-                    Flashcard card = flashcardsDB.remove(sim);
-                    card.setDefinition(apiFlashcardSet.getDefinitions()[i]);
-                    card.setTerm(apiFlashcardSet.getTerms()[i]);
-                    card.setAlignment(apiFlashcardSet.getAlignment()[i]);
-                    toSave.add(card);
-                } else {
-                    // add
-                    Flashcard card = new Flashcard(apiFlashcardSet.getId(), apiFlashcardSet.getDefinitions()[i], apiFlashcardSet.getTerms()[i], apiFlashcardSet.getAlignment()[i]);
-                    toSave.add(card);
+            List<Flashcard> toDelete = new LinkedList<>(); // all in flashcardDB but not in toSave
+
+            for (int i = 0; i < apiFlashcardSetEdit.getEditMap().length; i++) {
+                if (apiFlashcardSetEdit.getEditMap()[i].getEditType() == APIFlashcardSetEdit.EditType.Add) {
+                    Card newCard = apiFlashcardSetEdit.getEditMap()[i].getNewCard();
+                    toSave.add(new Flashcard(setID, newCard.getDefinition(), newCard.getTerm(), newCard.getAlignment()));
+                } else if (apiFlashcardSetEdit.getEditMap()[i].getEditType() == APIFlashcardSetEdit.EditType.Modify) {
+                    Card oldCard = apiFlashcardSetEdit.getEditMap()[i].getOldCard();
+                    Card newCard = apiFlashcardSetEdit.getEditMap()[i].getNewCard();
+                    try {
+                        Flashcard dbCard = Flashcard.findFirstEquals(flashcardsDB, oldCard);
+                        flashcardsDB.remove(dbCard);
+                        if (!dbCard.equals(newCard)) {
+                            dbCard.setTerm(newCard.getTerm());
+                            dbCard.setDefinition(newCard.getDefinition());
+                            dbCard.setAlignment(newCard.getAlignment());
+                            toSave.add(dbCard);
+                        }
+                    } catch (NoSuchElementException e) {
+                        e.printStackTrace();
+                        Flashcard dbCard = new Flashcard(setID, newCard.getDefinition(), newCard.getTerm(), newCard.getAlignment());
+                        toSave.add(dbCard);
+                    }
+                } else if (apiFlashcardSetEdit.getEditMap()[i].getEditType() == APIFlashcardSetEdit.EditType.Delete) {
+                    Card oldCard = apiFlashcardSetEdit.getEditMap()[i].getOldCard();
+                    try {
+                        Flashcard dbCard = Flashcard.findFirstEquals(flashcardsDB, oldCard);
+                        flashcardsDB.remove(dbCard);
+                        toDelete.add(dbCard);
+                    } catch (NoSuchElementException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
-            toDelete = new LinkedList<>(flashcardsDB);
+
 
             flashcardService.save(toSave);
             flashcardService.remove(toDelete);
