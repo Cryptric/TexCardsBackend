@@ -39,11 +39,15 @@ public class Flashcard {
     }
 
     public boolean equals(Card card) {
-        return definition.equals(card.getDefinition()) && term.equals(card.getTerm()) && alignment == card.getAlignment();
+        return nullStringEquals(definition, card.getDefinition()) && nullStringEquals(term, card.getTerm()) && alignment == card.getAlignment();
     }
 
     public static Flashcard findFirstEquals(List<Flashcard> flashcards, Card card) {
         return flashcards.stream().filter(x -> x.equals(card)).findFirst().orElseThrow();
+    }
+
+    private static boolean nullStringEquals(String s1, String s2) {
+        return (s1 == null && s2 == null) || (s1 != null && s1.equals(s2));
     }
 
 }

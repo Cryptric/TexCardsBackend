@@ -12,11 +12,6 @@ public class RequestUtil {
     TexCardsUserService texCardsUserService;
 
 
-    public boolean hasReadPermission() {
-        SecurityContextHolder.getContext().getAuthentication().getName();
-        return false;
-    }
-
     public String getUsername() {
         return SecurityContextHolder.getContext().getAuthentication().getName();
     }
@@ -25,8 +20,8 @@ public class RequestUtil {
         return texCardsUserService.findByUsername(getUsername()).getId();
     }
 
-    public boolean hasWritePermission() {
-        return false;
+    public String unescapeSeparators(String separator) {
+        return separator.replaceAll("\\n", "\n").replaceAll("\\t", "\t");
     }
 
 }

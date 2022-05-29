@@ -1,6 +1,7 @@
 package ch.cryptric.tex.cards.texcardsrestservice.controller;
 
 import ch.cryptric.tex.cards.texcardsrestservice.api.request.APIFlashcardSetEdit;
+import ch.cryptric.tex.cards.texcardsrestservice.api.request.APIFlashcardSetImport;
 import ch.cryptric.tex.cards.texcardsrestservice.api.request.APIFlashcardStar;
 import ch.cryptric.tex.cards.texcardsrestservice.api.request.Card;
 import ch.cryptric.tex.cards.texcardsrestservice.api.response.APIFlashcardSetName;
@@ -132,7 +133,38 @@ public class Controller {
             return ResponseEntity.ok(responseMap);
         } catch (Error | Exception e) {
             responseMap.put("error", true);
-            responseMap.put("message", "Could net fetch flashcard set name");
+            responseMap.put("message", "Could not fetch flashcard set name");
+            return ResponseEntity.internalServerError().body(responseMap);
+        }
+    }
+
+    @PutMapping(value = "/flashcard-set-import")
+    public ResponseEntity<?> importFlashcardSet(@RequestBody APIFlashcardSetImport apiFlashcardSetImport) {
+        Map<String, Object> responseMap = new HashMap<>();
+        try {
+            long userID = requestUtil.getUserID();
+            boolean hasPermission = flashcardSetUserRightService.hasUserWritePermission(userID, apiFlashcardSetImport.getFlashcardSetID());
+            if (!hasPermission) {
+                responseMap.put("error", true);
+                responseMap.put("message", "You do not have write permission for this flashcard set");
+                return ResponseEntity.status(403).body(responseMap);
+            }
+            String[] cardText = apiFlashcardSetImport.getInputTxt().split(requestUtil.unescapeSeparators(apiFlashcardSetImport.getCardSeparator()));
+            LinkedList<String[]> cards = new LinkedList<>();
+            Arrays.stream(cardText).forEach(c -> cards.add(Arrays.copyOf(c.split(requestUtil.unescapeSeparators(apiFlashcardSetImport.getTdSeparator()), 2), 2)));
+            LinkedList<Flashcard> dbCards = new LinkedList<>();
+            for (String[] c : cards) {
+                if (!((c[0] == null || c[0].strip().length() == 0) && (c[1] == null || c[1].strip().length() == 0))) { // catch empty cards
+                    dbCards.add(new Flashcard(apiFlashcardSetImport.getFlashcardSetID(), c[1], c[0], apiFlashcardSetImport.getAlignment()));
+                }
+            }
+            flashcardService.save(dbCards);
+            responseMap.put("error", false);
+            responseMap.put("data", true);
+            return ResponseEntity.ok(responseMap);
+        } catch (Error | Exception e) {
+            responseMap.put("error", true);
+            responseMap.put("message", "Could not import flashcard set");
             return ResponseEntity.internalServerError().body(responseMap);
         }
     }
